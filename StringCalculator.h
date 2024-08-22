@@ -1,59 +1,56 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#ifndef SOUNDEX_H
+#define SOUNDEX_H
+
+#include "Soundex.h"
 #include <ctype.h>
+#include <string.h>
+ #include <ctype.h>
 
-// Helper function to parse numbers from the input
-int parse_number(char* buffer) {
-    return atoi(buffer);
+char getSoundexCode(char c) {
+    c = toupper(c);
+   static  const char chartable[]={'0','1','2','3','0','1','2','0','0','2',
+'2','4','5','5','0','1','2','6','2','3',
+'0','1','0','2','0','2'};
+if (isalpha(c)){
+ return chartable[c-'A'];
 }
-
-// Helper function to handle delimiters and custom delimiters
-char get_delimiter(const char** input) {
-    if (**input == '/' && (*input)[1] == '/') {
-        char delimiter = (*input)[2];
-        *input += 4; // Skip over "//[delimiter]\n"
-        return delimiter;
-    }
-    return ',';
+ return '0';
 }
-
-// Main add function
-int add(const char* input) {
-    if (input == NULL || *input == '\0') {
-        return 0;
-    }
-
-    char delimiter = get_delimiter(&input);
-    int sum = 0;
-    char buffer[256];
-    int buffer_index = 0;
-    int number;
-
-    while (*input) {
-        if (*input == delimiter || *input == '\n') {
-            buffer[buffer_index] = '\0';
-            number = parse_number(buffer);
-            if (number < 0) {
-                fprintf(stderr, "negatives not allowed\n");
-                exit(1);
-            } else if (number <= 1000) {
-                sum += number;
-            }
-            buffer_index = 0;
-        } else {
-            buffer[buffer_index++] = *input;
+void Check_Soundex(char code,int sIndex, char prevcode,char *soundex)
+{
+ if (code != '0' && code != prevcode) {
+            soundex[sIndex++] = code;
+            prevcode=code;
         }
-        input++;
-    }
-    buffer[buffer_index] = '\0';
-    number = parse_number(buffer);
-    if (number < 0) {
-        fprintf(stderr, "negatives not allowed\n");
-        exit(1);
-    } else if (number <= 1000) {
-        sum += number;
-    }
-
-    return sum;
 }
+void updateSoundexArray(const char *name, int len, char *soundex)
+{
+        int sIndex=1;
+        char prevcode =getSoundexCode(name[0]);
+        soundex[0]=toupper(name[0]);
+
+  for (int i = 1; i < len && sIndex < 4; i++) 
+    {
+     char code =getSoundexCode(name[i]);
+       Check_Soundex(code, sIndex, prevcode,soundex);
+  soundex[sIndex]='\0';
+}
+}
+void finalizeSoundex(char *soundex)
+{
+ while (strlen(soundex)<4)
+  {
+   soundex[strlen(soundex)]='0';
+  }
+ soundex[4]='\0';
+}
+void generateSoundex(const char *name, char *soundex)
+{
+    int len = strlen(name);
+    soundex[0] = '\0';
+  updateSoundexArray(name,len,soundex);
+  finalizeSoundex(soundex);
+}
+   
+
+#endif // SOUNDEX_H
