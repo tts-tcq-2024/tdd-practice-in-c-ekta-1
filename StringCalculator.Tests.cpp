@@ -1,14 +1,44 @@
 #include <gtest/gtest.h>
-#include "Soundex.h"
-TEST(SoundexTestsuite, BasicSoundexCode) {
-    char soundex[5];
-   generateSoundex("Example", soundex);
-//EXPECT_STREQ(soundex, "E251");
+#include "StringCalculator.h"
 
+TEST(StringCalculatorAddTests, ExpectZeroForEmptyInput) {
+    int expectedresult = 0;
+    const char* input = "";
+    int result = add(input);
+    ASSERT_EQ(result, expectedresult);
 }
 
-TEST(SoundexTestsuite, IgnoresNonAlphabeticCharacters) {
-    char soundex[5];
-    generateSoundex("A1B2C3", soundex);
- //   ASSERT_EQ(std::string(soundex), "A123");
+TEST(StringCalculatorAddTests, ExpectZeroForSingleZero) {
+    int expectedresult = 0;
+    const char* input = "0";
+    int result = add(input);
+    ASSERT_EQ(result, expectedresult);
+}
+
+TEST(StringCalculatorAddTests, ExpectSumForTwoNumbers) {
+    int expectedresult = 3;
+    const char*  input = "1,2";
+    int result = add(input);
+    ASSERT_EQ(result, expectedresult);
+}
+
+TEST(StringCalculatorAddTests, ExpectSumWithNewlineDelimiter) {
+    int expectedresult = 6;
+    const char*  input = "1\n2,3";
+    int result =add(input);
+    ASSERT_EQ(result, expectedresult);
+}
+
+TEST(StringCalculatorAddTests, IgnoreNumbersGreaterThan1000) {
+    int expectedresult = 1;
+    const char*  input = "1,1001";
+    int result =add(input);
+    ASSERT_EQ(result, expectedresult);
+}
+
+TEST(StringCalculatorAddTests, ExpectSumWithCustomDelimiter) {
+    int expectedresult = 3;
+    const char*  input = "//;\n1;2";
+    int result = add(input);
+    ASSERT_EQ(result, expectedresult);
 }
